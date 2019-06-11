@@ -95,7 +95,7 @@ ggplot(df5, aes(x=reorder(geo,values), y=values))+
        y= "Percentage of total population")
 ```
 
-# 3 Grafikas
+
 ```{r, echo=FALSE}
 
 ```
