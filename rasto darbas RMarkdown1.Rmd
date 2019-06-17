@@ -1,0 +1,150 @@
+---
+author: "Erika Mackevič"
+date: '2019-06-17  '
+output:
+  pdf_document:
+    includes:
+      in_header: header_lt_text.txt
+  html_document:
+    df_print: paged
+title: "Jaunimo integracija į darbo rinką Lietuvoje"
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,collapse= TRUE, error = TRUE, warning=FALSE, message = FALSE, cache = TRUE)
+```
+Jaunimas yra ateities darbo karta, kurios užimtumo ir nedarbo problemos laikomos vienos svarbiausių tiek Lietuvoje, tiek kitose pasaulio šalyje. Dauguma moksleivių ir studentų ieško laikino darbo vasaros metu, kai kurie net derina darbo laiką su mokslu, o baigę aukštąjį mokslą absolventai intensyviai pradeda darbo paieškas pagal jų įgytą specialybę.  Tačiau dauguma studentų susiduria su integracijos problema darbo rinkoje, nes svajonės ir tikslai neatitinką realybę. Yra iškeliami keli pagrindiniai veiksniai, kurie nusako šios problemos atsiradimą ir pateikiantys atsakymą, kodėl jauno žmogaus darbo jėgos paklausa yra tokia maža. Pirmiausia, absolventų kvalifikacijos lygis neatitinka darbdavių reikalavimų. Dažnai girdime tokius komentarus, jog universitetų, kolegijų ar kitų aukštojo mokslo įstaigų parengti absolventai turi pakankamai daug teorinių žinių, bet mažai praktinių įgūdžių savo darbo srityje.  Antra, susiduriama su prastu informacijos pateikimu apie visas siūlomas aukštųjų mokymo įstaigų programas. Dažnas moksleivis neturėdamas pakankamai informacijos apie norimą studijuoti specialybę, baigęs studijas, patiria bedarbystę, dėl tos specialybės darbo vietų trūkūmo. Jaunas žmogus nesiorientuoja realioje situacijoje ir remdamasis idealiomis idėjomis apie būsimą darbą, neišanalizuoja realią situaciją darbo rinkoje. Naujausiais duomenimis  mažiausias įsidarbinimo galimybes Lietuvoje turi  politikai, administracijos darbuotojai, mokytojai, žurnalistai, kirpėjai, kosmetologai, o lengviausias- inžinieriai, mechanikai,  pardavėjai, statybininkai ir t.t.  Kaip matome, valstybėje jaučiamas techninių specialistų trūkumas, o humanitarinių ir socialinių- perteklius. Integracijos ir įsidarbinimo problemos sukelia jaunų žmonių migraciją arba bandymas suktis kitais, nelegaliais būdais. 
+
+Nepaisant šių kelių išvardintų problemų, remiantis pirmojo grafiko duomenis, paimtų iš Lietuvos statistikos depardamento duomenų bazės, galime pastebėti, kad jaunų,15-29 metų amžiaus, žmonių 2013-2018 metų laikotarpyje nedarbas sumažėjo. 2013 metais nedarbo lygis siekė apie 17%, kai tuo tarpu 2018  metais jis sumažėjo iki 7,5%.  
+
+
+```{r, echo=FALSE}
+if(!require(rsdmx)) install.packages("rsdmx"):require(rsdmx)
+if(!require(tidyverse)) install.packages("tidyverse"):require(tidyverse)
+if(!require(kableExtra)) install.packages("kableExtra"):require(kableExtra)
+if(!require(knitr)) install.packages("knitr"):require(knitr)
+if(!require(eurostat)) install.packages("eurostat"):require(eurostat)
+```
+
+```{r, echo=FALSE}
+# meta duomenu parsiutnimas....
+url <- "https://osp-rs.stat.gov.lt/rest_xml/dataflow/"
+meta <- readSDMX(url)
+meta <- as.data.frame(meta)
+```
+
+```{r, echo=FALSE}
+#S3R347 - Nedarbo lygis
+#Amžius (5 m. amžiaus grupės) | Lytis 
+S3R347_M3030905_2 <- readSDMX(providerId="LSD",
+                              resource = "data",
+                              flowRef="S3R347_M3030905_2",
+                              dsd=TRUE)
+S3R347_M3030905_2 <- as.data.frame(S3R347_M3030905_2,
+                                   labels=TRUE)
+```
+
+```{r, echo=FALSE}
+df7 <- S3R347_M3030905_2 %>%
+  filter((amziusM3030905%in% c("g015g029")),
+  LAIKOTARPIS>= "2013",
+  Lytis_label.lt== "Vyrai ir moterys")%>%
+select(-c(1,2,4:7,10:13))
+```
+
+```{r, echo=FALSE}
+library(ggplot2)
+ggplot(df7, aes(x=LAIKOTARPIS, y=obsValue, group=LAIKOTARPIS))+
+    geom_line(group=1)+
+    labs(title=" 15-29 metų jaunimo nedarbas",
+         subtitle="Šaltinis: LSD(S3R347_M3030905_2)",
+         x="Laikotarpis",
+         y="Procentai")
+```
+
+Ne tik Lietuvoje, bet ir visoje Europoje yra sprendžiamos jaunimo užimtumo problemos. Galėtume pasidžiaugti Lietuvos užimtumo didėjimu, tačiau lyginant su Europos Sąjungos šalimis nedarbo procentas nėra jau toks ir žemas.  Antrajame grafike, kurio duomenis yra iš Eurostat duombazės, matome visų ES šalių jaunimo (15-24metų) nedarbo lygį. Šalys turinčios mažą bedarbystės lygį: Čekija, Vengrija, Vokietija, Malta, o daugiausia jaunų bedarbių turi Graikija ir Ispanija. Šios dvi ES šalys turi didžiausią procentą ir jis siekia beiveik 12%. Europos šalyse buvo tirta jaunimo, baigusio mokyklą, nedarbo lygį. Buvo padaryta išvada, jog 50% jaunimo praėjus vieneriems metams po mokyklos pabaigimo yra bedarbiai. Ypač tai aktualu yra Lenkijai, Slovakijai ir Graikijai (@braziene2012darbo ). Lietuvos jaunimo nedarbo situacija nėra viena blogiausių Europoje, bet yra, kur tobulėti, kad pasiekti dar geresnių rezultatų. 
+
+```{r, echo=FALSE}
+une_rt_a <- get_eurostat("une_rt_a",
+                         stringsAsFactors = FALSE,
+                         filters= list(age="TOTAL",
+                                       sex="T",
+                                       unit="PC_POP"))
+```
+
+```{r, echo=FALSE}
+df5 <- une_rt_a %>%
+  filter(geo %in% c("BE", "BG", "CZ", "DK", "DE", "EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE", "UK"),
+         time=="2018-01-01") %>%
+  select(-c(1:3,5))
+```
+
+```{r, echo=FALSE}
+ggplot(df5, aes(x=reorder(geo,values), y=values))+
+  geom_bar(stat= "identity",
+           fill="purple")+
+  labs(title="15-24 amžiaus jaunimo nedarbo lygis Europos sąjungoje",
+       subtitle = "Source: Eurostat (une_rt_a)",
+       x="Europos sąjungos šalys",
+       y= "Bendras gyventojų procentas")
+```
+
+B.Gruževskis, L. Okunevičiūtė- Neverauskienė savo „Jaunimo integracijos į darbo rinką“ straipsnyje rašė, jog norint išsiaiškinti jaunimo nedarbo priežastis, reikia įvertinti jo užimtumo galimybes bei sukurti užimtumo didinimo priemonių sistemą, labiau tenkinančių darbdavių poreikius ir kartu sudarančią didesnes įsidarbinimo galimybes (@gruvzevskis2003jaunimo). Jie išskyrė 6 jaunimo užimtumo didinimo priemonių sistemų grupes, bet  aš labiausiai pabrėžčiau bendrojo lavinimo bei profesinio mokymo tobulinimus. Kaip jau minėjau, dauguma žmonių turi vienodą ir kartais galimai turintys klaidingą nuomonę, jog mokyklos, universitetai, kolegijos ir kitos mokymo įstaigos nesuteikia pakankamai gero bendro išsilavinimo, profesinių žinių ir, žinoma, praktikos. Kiekvienas sutiktu, kad Lietuvos švietimo sistemą reiktų keisti, tačiau, mano manymu, net ir pati „tobuliausia“ mokymo programa neprivers nei moksleivių, nei studentų mokytis ir domėtis Lietuvos politika, ekonomika, mokslu ir kt. Galėtume vardinti daugybę mokymo programos minusų, pvz.: „sausos“ teorinės medžiagos skaitymą, beprasmį knygų ar skaidrių perrašinėjimą, praktinių uždavinių trūkumą ir taip toliau, tačiau tik nuo paties studento priklauso, ar jis apsiribos tik mokymo įstaigų suteikta mokymosi programa, ar bandys pats ieškotis sau naudingos ir įdomios medžiagos. Šiuolaikiniai darbo rinkai vis svarbesnės darosi žmogaus sukauptos žinios, įgūdžiai, asmeninės savybės(@paliakaite2013lietuvos). Studentai gebantys prisitaikyti prie kintančios aplinkos, turintys aukštą bendrą išsilavinimą ir siekiantys savo užsibrėžtų tikslų lengviau prisitaiko prie darbo rinkos ir lengviau gali gauti norimą darbą, nes B.Gruževskio ir L. Okunevičiūtės- Neverauskienės atliktame tyrime buvo paminėta, jog darbdaviai vertina žmogų ne tik pagal jo puikias specialybės žinias, bet taip pat ir mokantį išsisukti iš tam tikrų sudėtingų situacijų, būti neabejingam darbui ir  komunikabiliam, t.y. gerai sutarti su kolegomis ir t.t.  Juk noras užimti modernią darbo vietą su norimu atlyginimu ir gauti stabilias sąlygas reikalauja savo žinių plėtojimas ir nuolatinį mokymąsi (konferencijų klausymas, įvairūs profesiniai mokymai, tendencijų sekimas ir t.t.) . Dėl šių priežasčių jaunimas yra labiau linkęs keisti darbo vietas ieškodami sau palankiausio varianto nei vyresnio amžiaus žmonės, nes dauguma mąsto, jog magistro ar doktorantūros laipsnių siekimas  reikalauja didesnių atlyginimų, o tam tikri darbdaviai nėra pasiryžę mokėti daugiau savo darbuotojui. Mažas darbo užmokestis priveda prie kvalifikuotų darbuotojų trūkumo ir nedarbo, juk jaunas žmogus papuolęs į milžinišką darbo rinką tikisi gauti didelį atlyginimą, bet, deja, retai kam pasiseka susirasti tokį gerai apmokamą darbą iš karto po studijų baigimo ir todėl jaunimas gali pasiduoti ir nebesiekti išsvajotos darbo vietos ir pasukti visai kita linkme, t.y. rasti kitą gerai apmokamą darbą, kuris visiškai nesusijęs su įgyta profesija, arba užsiimti nelegaliu darbu. 
+
+Julija Kačanova ir Aivaras Vencevičius straipsnyje „Jaunimo galimybių rinkodara“ kalba, jog reiktų efektyviau koordinuoti ir tinkamai informuoti jaunimą apie darbo galimybes, nes nežinodami savo perspektyvų jaunimas nėra linkęs domėtis tuo ką jiems siūloma (@julijakačanovaaivarasvencevičius2015) . Galima pastebėti, jog dažnas žmogus universitete baigia vieną profesiją, bet patekęs į darbo rinką imasi dirbti kitų darbų, visiškai nesusijusių su jo profesija. Galimai, jog ši problema kyla dėl prasto informacijos pateikimo apie studijų programas ir ateities perpektyvas pabaigus pasirinktą profesiją. Šiais laikais yra pakankamai daug įvairios naudingos ir nenaudingos informacijos ir dauguma žmonių tiesiog nemoka tinkamai atsirinkti to ko jiems labiausiai reikia. Todėl atsiranda poreikis šią informacija susiaurinti, modernizuoti, t.y. pateikti įvariomis vaizdinėmis medžiagomis, pravesti neįprastas paskaitas, rodant vaizdo įrašus apie Lietuvos suteikiamas studijų galimybes, profesijų pasirinkimą arba  leidžiant moksleiviui išbandyti praktiškai norimą įgyti profesiją, kad jis suvoktų, ar verta daugely metų paskirti savo laiką ir mokytis šio „amato“. Nemanau, kad Lietuvoje nėra šių mano išvardintų dalykų, tačiau, mano nuomone, šios informacijos pateikimas yra pakankamai neįdomus ir nei vienas moksleivis nėra suinteresuotas eiti į tokio pobūdžio konferencijas, o kai norima gauti konsultacijos apie studijų programas ir kt. dalykus, tai dažniausiai „niekas nieko nežino“ ir jaunimui tenka spręsti kilusias problemas savarankiškai.  Jei moksleiviai žinotų, kurios srities specialistų trūksta Lietuvoje, tada gali būt, kad neturėtume perteklinį darbuotojų skaičių tik vienoje tam tikroje srityje, pvz.: teisėje, o nepopuliarių profesijų darbo vietas taip pat užpildytų nauji specialistai.
+
+Lietuvoje darbdaviai nėra labai suinteresuoti įdarbinti jaunimą ir mokėti pakankamai gerus atlyginimus, o jaunimui siūlomos darbo vietos dėl mažo darbo užmokesčio nėra patrauklios. Kokybiškų darbų vietų stoka priverčia jaunus žmones migruoti į Europos sąjungos arba kitas šalis (@okunevivciute2008jaunimo), ieškant sau palankių sąlygų dirbti. Kiekvienais metais yra stebima jaunų žmonių migracija į kitas šalis. Pastebima, kad vis daugiau jaunų žmonių pasiryžta palikti tėvynę, dėl didesnio darbo užmokesčio ir geresnių sąlygų gyventi. Pagal Lietuvos statisatikos departamento tinklapio duomenis 2019 metų pradžioje užfiksuota 2  793 986 gyventojų, kai 2011 metais gyventojų skaičius siekė 3 052 588. Grafike matome, jog nuo 2014 metų jaunų(15-29 metų)  migrantų skaičius didėjo, o  2017 metais buvo užfiksuota rekordiškas jų skaičius. 
+
+```{r, echo=FALSE}
+S3R106_M3020103 <- readSDMX(providerId="LSD",
+                              resource = "data",
+                              flowRef="S3R106_M3020103",
+                              dsd=TRUE)
+S3R106_M3020103 <- as.data.frame(S3R106_M3020103,
+                                   labels=TRUE)
+```
+
+```{r, echo=FALSE}
+df3 <- S3R106_M3020103 %>%
+  filter((Amzius_grupemis_pameciui %in% c("g015g019", "g020g024", "g025g029")),
+    LAIKOTARPIS>= "2013",
+    Lytis_label.lt== "Vyrai ir moterys") %>%
+  select(-c(1:5,7,10:13))
+
+  
+```
+
+```{r, echo=FALSE}
+df4 <- df3 %>% group_by(LAIKOTARPIS) %>% summarize(avg=mean(obsValue, na.rm = TRUE))
+```
+
+```{r, echo=FALSE}
+df6 <- df4 %>% spread(LAIKOTARPIS, avg)
+```
+
+```{r, echo=FALSE}
+library(knitr)
+```
+
+```{r, echo=FALSE, fig.height=4}
+library(ggplot2)
+ggplot(df4, aes(x=LAIKOTARPIS, y=avg, group=LAIKOTARPIS))+
+    geom_line(group=1)+
+    labs(title=" 15-29 metų jaunimo emigracija iš Lietuvos",
+         subtitle="Šaltinis: LSD",
+         x="Laikotarpis",
+         y="Emigrantų skaičius")
+```
+
+Lietuva dėl jaunimo emigracijos susiduria su socialinėmis, demografinėmis problemomis: kiekvienais metais mažėja gyventojų skaičius, pastebimas spartus gyventojų senėjimas, vyksta amžiaus struktūros deformacija, dėl jaunų žmonių emigracijos mažėja gimstamumas,  mažėja jaunų išsilavinusių darbingo amžiaus žmonių, neretai trūksta gerų specialistų (@siniavskaite2015lietuvos). Dauguma žmonių išvyksta į užsienio šalis norėdami šiek tiek užsidirbti, kad grįžę į Lietuvą galėtų nusipirkti nekilnojamo turto, ar padėti savo šeimai, kurios socialinė padėtis yra prasta. Tačiau adaptavęsi svetimoje šalyje jaunimas pasilieka ten ilgesniam laikui, o vėliau ir visam gyvenimui, nes ten atranda  darbą su neblogu darbo užmokesčiu, kuris leidžia ne tik išsinuomoti butą, nusipirkti būtiniausių prekių, bet ir leidžiantis sutaupyti dalį uždirbtų pinigų, keliauti, apmokėti visas giminaičių, gyvenančių Lietuvoje, mokesčius ir kita. Be abejo yra dar vienas veiksnys lemiantis jaunimo išvykimą iš gimtosios šalies. Užsienis vilioja jaunimą ne tik savo darbo užmokesčiu ir perspektyvomis, bet ir aukštuoju mokslu. Vieni geriausių Lietuvos respublikos abiturientų mieliau pasirenka tokius universitetus kaip University of Cambridge, UCL (University College London), University of Oxford, ETH Zurich (Swiss Federal Institute of Technology) ir taip toliaiu tikėdamiesi, kad ten įgaus daugiau žinių nei besimokydami Lietuvos universitetuose ar kitose mokslo įstaigose, nes nėra įsitikinę Lietuvos švietimo kokybe. Tokios valstybės kaip JAV, Anglija, Danija ir kt. skiria daug dėmesio švietimo sistemos tobulinimui ir nebe reikalo jų universitetai ir kolegijos yra pripažinti vieni geriausių pasaulyje. Tačiau mokslas užsienyje nėra toks pigus kaip Lietuvoje. Tarkime studijos JAV kainuotų apie 50tūkst. dolerių per metus, kai Lietuvoje dauguma studentų gali baigti mokslą visiškai nemokamai.  Apsvarstę savo biudžetą dauguma lietuvių negali priimti pasiūlymo studijuoti užsienio mokymo įstaigose. Bet tai nesustabdo migracijos, juk baigę nemokamą mokslą Lietuvoje ir neradę tinkamo darbo absolventas gali drąsiai išvažiuoti dirbti į bet kurią pasaulio šalį. 
+
+##Išvados
+
+Jaunimo integracijos problemos atsiranda dėl kelių paprastų priežasčių: absolventų žinių trūkumo jų darbo srityje, prasto informavimo apie studijų programas ir jų perspektyvas, tam tikros srities darbuotojų pertekliaus, prastų darbo sąlygų... Bet pati didžiausia integracijos problema yra darbdavių nenoras priimti patirties neturinčių studentų ar baigusių studijas jaunimą ir apmokyti juos darbo vietoje. Juk priimdami naują žmogų kiekvienas darbavys tikisi, jog jis atneš didesnį pelną savo žiniomis, įgitomis universitete ar kitoje mokymo įstagoje. Tačiau šis mąstymas būna klaidingas, nes absolventai nemoka savo teorinių žinių panaudoti realioje situacijoje ir darbaviui tenka absolventą mokyti nuo pačių elementariausių dalykų. Todėl ieškodamas darbo studentas susiduria su darbdavių reikalavimais turėti kelių metų darbo praktikos toje srityje, bet universitetas nesuteikia pakankamai šių įgūdžių studentui, kad jis galėtų be jokių kliūčių įsidarbinti norimoje valstybinėje institucijoje ar įmonėje. Retkarčiais pasitaiko ir tokių atvejų, jog pats studentas nepasinaudoja galimybe atlikti praktiką pasiūlytoje vietoje ir greičiausiai atsisakymo priežastis būna dėl noro užsidirbti, dirbant darbą ne pagal savo specialybę, kurio patirtis vargu ar padės įsidarbinti baigus aukštąjį mokslą. Šiame rašto darbe pateiktais grafikais galime padaryti išvadą, kad jaunimo nedarbas mažėja Lietuvoje, tačiau jų migracija vis tiek pakankamai didelė. Migracija yra jaunimo integracijos į darbo rinką padarinys, mažinantis gyventojų skaičių Lietuvos valstybėje. Taip pat pasireiškia jaunų, perpektyvių gyventojų trūkumas Lietuvoje, gimstatumo mažėjimas, tuo pačiu pasireiškia senėjimas ir kitos demografinės problemos. Jaunimo bėgimas iš Lietuvos nėra geriausias problemos sprendimo būdas. Mano manymu, kiekvienas turi galimybę Lietuvoje gauti norimą darbą, bet reikia įdėti nemažai pastangų mokymuisi, neapsiribojant tik univertitetų, kolegijų suteikta informacija, bandyti plėsti savo draugų ir pažįstamų akiratį, ieškoti savo naujų talentų, bruožų leidžiančių lengviau adaptuotis gyvenamojoje aplinkoje.
+
+
+# Literaturos sąrašas
+
