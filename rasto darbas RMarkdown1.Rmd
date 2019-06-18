@@ -134,7 +134,7 @@ library(ggplot2)
 ggplot(df4, aes(x=LAIKOTARPIS, y=avg, group=LAIKOTARPIS))+
     geom_line(group=1)+
     labs(title=" 15-29 metų jaunimo emigracija iš Lietuvos",
-         subtitle="Šaltinis: LSD",
+         subtitle="Šaltinis: LSD(S3R106_M3020103)",
          x="Laikotarpis",
          y="Emigrantų skaičius")
 ```
